@@ -1,0 +1,673 @@
+/* =============================================================
+   Reset
+   本项目不使用任何 UI 框架，也没有一个工具类；这一层取代了原先
+   仅为拿到 Preflight 而引入的 Tailwind，行为与其保持一致。
+   下方样式依赖它提供：全局 border-box（.screen 的 100dvh + padding）、
+   清零的 margin/padding、无序号列表（.r-bullets 自绘圆点）、
+   按钮字体继承。
+   ============================================================= */
+*,
+::before,
+::after,
+::backdrop {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+html {
+  line-height: 1.5;
+  tab-size: 4;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+}
+
+button {
+  appearance: none;
+  background-color: transparent;
+  font: inherit;
+  color: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  vertical-align: middle;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* =============================================================
+   令牌：Geist Design System 中性灰 + 简历衬线字体
+   风格参照 https://aleckmann.com/resume/（衬线、单色、居中抬头）。
+   ============================================================= */
+:root {
+  /* ---- Geist 中性灰阶 ---- */
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #ebebeb;
+  --gray-300: #e3e3e3;
+  --gray-400: #d4d4d4;
+  --gray-500: #a3a3a3;
+  --gray-600: #666666;
+  --gray-700: #525252;
+  --gray-800: #333333;
+  --gray-900: #171717;
+  --gray-1000: #000000;
+
+  /* ---- 语义别名 ---- */
+  --ink: #171717; /* 主文本（Geist neutral-900） */
+  --muted: #525252; /* 次级文本 */
+  --faint: #666666; /* 三级文本 */
+  --paper: #ffffff; /* 页面 / 纸张 */
+  --line: #d4d4d4; /* 分节下划线（Geist neutral-400，比正文边框略重） */
+  --line-faint: #ebebeb;
+
+  /* ---- 间距（4px 基准）---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 64px;
+
+  /* ---- 圆角 + squircle ---- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --corner-smooth: superellipse(2);
+
+  /* ---- 字号 ---- */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 16px;
+  --text-lg: 19px;
+  --text-xl: 22px;
+  --text-name: 40px;
+
+  /* ---- 字体 ----
+     字体按简历「语言版本」切换（见下方 .resume--en / .resume--zh）：
+     - 英文简历：Cormorant Garamond（姓名）+ Libre Baskerville（正文），衬线，aleckmann 风。
+     - 中文简历：Noto Sans SC（中文）+ Inter（夹带的英文），无衬线。
+     root 默认给页面 chrome（切换按钮/下载按钮）用中性无衬线。 */
+  --font-body: "Inter", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-name: var(--font-body);
+}
+
+/* 英文简历：衬线（aleckmann） */
+.resume--en {
+  --font-body: "Libre Baskerville", "Noto Sans SC", Georgia, "Times New Roman", serif;
+  --font-name: "Cormorant Garamond", "Noto Sans SC", Georgia, serif;
+}
+/* 中文简历：Noto Sans SC + 夹带英文用 Inter，无衬线 */
+.resume--zh {
+  --font-body: "Inter", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-name: "Inter", "Noto Sans SC", system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit; /* 单色：链接与正文同色 */
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* =============================================================
+   外壳 + 顶部工具条（语言切换 + 下载，打印隐藏）
+   ============================================================= */
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) var(--space-5) var(--space-9);
+}
+
+/* 控件统一高度：语言切换与下载按钮同高（避免上下不齐） */
+:root {
+  --control-h: 40px;
+}
+
+/* 顶部工具条：语言切换居左、下载居右，对齐简历栏宽 */
+.toolbar {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+.toolbar .langtoggle {
+  margin-right: auto; /* 切换推到最左，下载留在最右；无切换时下载仍靠右 */
+}
+/* 分段控件：浅灰轨道 + 选中态白色药丸（无黑底，与描边按钮同属安静体系） */
+.langtoggle {
+  display: inline-flex;
+  height: var(--control-h);
+  box-sizing: border-box;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  corner-shape: var(--corner-smooth);
+  background: var(--gray-100);
+}
+.langtoggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  corner-shape: var(--corner-smooth);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 0 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+.langtoggle button:hover {
+  color: var(--ink);
+}
+.langtoggle button.is-active {
+  background: #fff;
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow:
+    0 1px 2px rgba(23, 23, 23, 0.1),
+    0 0 0 1px rgba(23, 23, 23, 0.04);
+}
+
+/* 主按钮（下载）：白底 + 浅灰描边 + 极淡阴影 = 微浮起的白色 chip，
+   与语言切换的白色药丸同色阶同质感；悬停柔和反馈，不发黑不抢。 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-h);
+  box-sizing: border-box;
+  padding: 0 var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-md);
+  corner-shape: var(--corner-smooth);
+  border: 1px solid var(--gray-300);
+  background: #fff;
+  color: var(--ink);
+  box-shadow:
+    0 1px 2px rgba(23, 23, 23, 0.08),
+    0 0 0 1px rgba(23, 23, 23, 0.02);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+  box-shadow:
+    0 1px 3px rgba(23, 23, 23, 0.12),
+    0 0 0 1px rgba(23, 23, 23, 0.03);
+  text-decoration: none;
+}
+/* 次级按钮（回到顶部）：纯描边、无填充无阴影，弱于主按钮 */
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--gray-300);
+  box-shadow: none;
+}
+.btn--ghost:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
+  color: var(--ink);
+  box-shadow: none;
+}
+/* 纯图标方形按钮（回到顶部）：正方形，仅图标 */
+.btn--icon {
+  width: var(--control-h);
+  padding: 0;
+}
+
+/* 底部操作区：回到顶部（左）+ 下载 PDF（右），与顶部工具条同一套左右对齐 */
+.actions {
+  width: 100%;
+  max-width: 860px;
+  margin-top: var(--space-7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+}
+
+/* =============================================================
+   简历主体（无卡片、居中、衬线、单色）
+   ============================================================= */
+.resume {
+  width: 100%;
+  max-width: 860px;
+  font-family: var(--font-body);
+}
+
+/* 中文简历名字用 Inter 时略收一号字重/字号，避免过重 */
+.resume--zh .r-name {
+  font-size: 34px;
+  font-weight: 700;
+}
+
+/* =============================================================
+   抬头（左对齐，三种布局）
+   compact  无 summary：左名字 / 右联系方式
+   split    有 summary，联系方式少：左名字 / 右联系方式 + 下方 summary
+   stack    有 summary，联系方式多：名字 / 联系方式 / summary 自上而下左排
+   ============================================================= */
+.r-head {
+  margin-bottom: var(--space-7);
+}
+/* split / compact：名字与联系方式两端对齐 */
+.r-head__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3) var(--space-6);
+  flex-wrap: wrap;
+}
+.r-id {
+  min-width: 0;
+}
+.r-name {
+  font-family: var(--font-name);
+  font-size: var(--text-name);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+}
+.r-name__en {
+  margin-left: var(--space-3);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- 联系方式 ---- */
+.r-contact {
+  display: flex;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.r-contact__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.r-contact svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+/* 右侧竖排（split / compact） */
+.r-contact--list {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  text-align: right;
+  padding-top: 7px; /* 与名字视觉基线对齐 */
+}
+/* 名字下方横排（stack） */
+.r-contact--row {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  margin-top: var(--space-4);
+}
+
+/* ---- 个人简介 ---- */
+.r-summary {
+  margin: var(--space-4) 0 0;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+/* 正文只在溢出时换行：逐行填满，不做匀行/孤行调整（客户要求，勿加 balance/pretty） */
+.r-summary,
+.r-bullets li,
+.r-note,
+.r-entry__role {
+  text-wrap: wrap;
+}
+
+/* 窄屏：联系方式回落为左对齐横排，避免右侧竖排贴边 */
+@media (max-width: 560px) {
+  .r-head__top {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .r-contact--list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    text-align: left;
+    padding-top: 0;
+    gap: var(--space-1) var(--space-4);
+  }
+}
+
+/* ---- 分节 ---- */
+.r-section {
+  margin-top: var(--space-6);
+}
+.r-section__title {
+  font-family: var(--font-body);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--ink);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--line);
+  margin: 0 0 var(--space-3);
+}
+
+/* ---- 条目 ---- */
+.r-entry {
+  margin-bottom: var(--space-4);
+}
+.r-entry:last-child {
+  margin-bottom: 0;
+}
+.r-entry__org {
+  font-size: var(--text-md);
+  font-weight: 700;
+  margin: 0;
+}
+.r-entry__org-en {
+  font-weight: 400;
+  color: var(--ink);
+}
+/* 第一行：机构 / 项目名（左）↔ 地点（右），两端对齐同基线 */
+.r-entry__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+/* 第二行：职位 / 学位（左）↔ 起止时间（右） */
+.r-entry__line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin-top: 1px;
+}
+.r-entry__role {
+  font-style: italic;
+  color: var(--ink);
+}
+/* 地点（第一行右）与日期（第二行右）：英文斜体、中文正体，不换行 */
+.r-entry__loc,
+.r-entry__date {
+  flex: none;
+  font-style: italic;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+/* 要点：空心圆圈项目符号 */
+.r-bullets {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+.r-bullets li {
+  position: relative;
+  padding-left: var(--space-4);
+  margin-bottom: var(--space-1);
+  line-height: 1.65;
+}
+.r-bullets li::before {
+  content: "";
+  position: absolute;
+  /* 圆点描边是硬边缘，落在 x=0 会比正文字形（有左侧边距）更偏左；右移 2px 让其视觉上落在对齐线上 */
+  left: 2px;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.25px solid var(--gray-500);
+}
+
+/* 附注行（课程 / 技术栈）：英文斜体、中文正体，同主文本色 */
+.r-note {
+  margin: var(--space-2) 0 0;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* Relevant Coursework 等：去英文斜体，正体显示 */
+.r-note--plain {
+  font-style: normal;
+}
+
+/* 中文简历：一律正体（斜体仅用于英文衬线版，中文斜体不美观） */
+.resume--zh .r-entry__role,
+.resume--zh .r-entry__date,
+.resume--zh .r-entry__loc,
+.resume--zh .r-note {
+  font-style: normal;
+}
+
+/* ---- 技能：两列网格，标签列 + 内容列，各行内容左缘对齐、便于扫读 ---- */
+.r-skills {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--space-6);
+  row-gap: var(--space-1);
+  align-items: baseline;
+}
+.r-skill__cat {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.r-skill__items {
+  text-align: left;
+}
+
+/* ---- 语言 / 行内标签 ---- */
+.r-inline {
+  margin: 0 0 var(--space-1);
+}
+.r-inline__label {
+  font-weight: 700;
+}
+
+/* =============================================================
+   手机适配（≤600px）
+   两端对齐的两列在窄屏拥挤，且 .r-entry__loc/date 的 nowrap 会横向溢出
+   （长技术栈撑破视口）。改为上下堆叠：标题独占整行，地点/技术栈与日期
+   落到下一行左对齐；技能表改单列。桌面（>600px）保持原两列排版不变。
+   ⚠️ 本块须位于上述基础规则之后，靠源码顺序覆盖同特异度的 nowrap/网格列。
+   ============================================================= */
+@media (max-width: 600px) {
+  .screen {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+  }
+  /* align-items:stretch 让每个子项占满容器宽度（而非 max-content），
+     配合 white-space:normal 使长技术栈在容器内换行，消除横向溢出。 */
+  .r-entry__head,
+  .r-entry__line {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .r-entry__loc,
+  .r-entry__date {
+    white-space: normal;
+    min-width: 0;
+  }
+  /* 技能表改单列：标签一行 / 内容一行；minmax(0,1fr) 允许内容列收缩换行 */
+  .r-skills {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .r-skill__items {
+    overflow-wrap: break-word;
+  }
+  .r-skill__cat {
+    margin-top: var(--space-2);
+  }
+  .r-skills > .r-skill__cat:first-child {
+    margin-top: 0;
+  }
+}
+
+/* =============================================================
+   A4 打印 / PDF —— 与网页同一套 HTML。
+   网页版保持宽松易读；打印版在 @media print 内重定义间距/字号令牌。
+   字号阶级体系（以 10pt 正文为基准，pt 为打印实际观感）：
+     姓名 21pt · 分节标题 13.5pt · 条目标题 10.5pt(加粗) · 正文 10pt ·
+     次级(日期/职位/附注/技能/联系) 9.4pt · 标签 8.6pt
+   —— 正文回到可读的 10pt；内容多时自然跨到第 2 页。边距 14mm≈0.55″。
+   ============================================================= */
+@page {
+  size: A4;
+  margin: 14mm 0;
+}
+
+@media print {
+  /* 打印字号阶级：正文 10pt，层级清晰、便于阅读 */
+  :root {
+    --space-1: 3px;
+    --space-2: 6px;
+    --space-3: 9px;
+    --space-4: 11px; /* 条目间距 */
+    --space-5: 14px;
+    --space-6: 16px;
+    --space-7: 18px;
+    --space-8: 20px;
+    --space-9: 24px;
+
+    --text-xs: 11.5px; /* ≈8.6pt 标签 */
+    --text-sm: 12.5px; /* ≈9.4pt 次级：日期/职位/附注/技能/联系 */
+    --text-base: 13.5px; /* ≈10pt 正文 */
+    --text-md: 14px; /* ≈10.5pt 条目标题（加粗） */
+    --text-lg: 15.5px;
+    --text-xl: 18px; /* ≈13.5pt 分节标题 */
+    --text-name: 28px; /* ≈21pt 姓名 */
+  }
+
+  body {
+    background: #fff;
+    font-size: var(--text-base);
+    line-height: 1.42;
+  }
+  .screen {
+    padding: 0;
+  }
+  .toolbar,
+  .actions {
+    display: none !important;
+  }
+  /* 只打印简历本体：屏蔽浏览器扩展/开发者工具注入到 <body> 顶层的浮动 UI、
+     悬浮按钮、脚本占位等（它们都是 body 的直接子元素，不属于简历）。 */
+  body > *:not(.screen) {
+    display: none !important;
+  }
+  .resume {
+    max-width: 100%;
+    padding: 0 14mm;
+  }
+  .resume--zh .r-name {
+    font-size: 25px;
+  }
+  /* 分节之间留一点呼吸（比条目间距略大） */
+  .r-section {
+    margin-top: var(--space-5);
+  }
+  .r-head {
+    margin-bottom: var(--space-5);
+  }
+  .r-summary {
+    line-height: 1.5;
+  }
+  .r-bullets li {
+    line-height: 1.42;
+    padding-left: 16px;
+  }
+  /* 圆点竖直居中：对齐首行「行盒中心」，与字号/中英文无关（em 硬调会顾此失彼） */
+  .r-bullets li::before {
+    top: 0.5lh;
+    transform: translateY(-50%);
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* 不在条目/标题内部分页，标题不落在页尾 */
+  .r-entry,
+  .r-skills,
+  .r-inline {
+    break-inside: avoid;
+  }
+  .r-section__title {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+}
