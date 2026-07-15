@@ -110,14 +110,15 @@ video {
   --radius-md: 8px;
   --corner-smooth: superellipse(2);
 
-  /* ---- 字号 ---- */
-  --text-xs: 12px;
-  --text-sm: 13px;
-  --text-base: 15px;
-  --text-md: 16px;
-  --text-lg: 19px;
-  --text-xl: 22px;
-  --text-name: 40px;
+  /* ---- 字号 ----
+     屏幕用 px；打印在 @media print 内以 pt 重新定义，且取值必须是 0.75 的
+     整数倍（见那里的说明）。每个令牌都必须有人用，不留「备用档」。 */
+  --text-sm: 13px; /* 联系方式 */
+  --text-base: 15px; /* 正文：bullets / 日期 / 职位 / 地点 / 附注 / 技能 */
+  --text-md: 16px; /* 条目标题（加粗） */
+  --text-xl: 22px; /* 分节标题 */
+  --text-name: 40px; /* 姓名 */
+  --text-name-zh: 34px; /* 中文名用 Inter 字重更重，收一号 */
 
   /* ---- 字体 ----
      字体按简历「语言版本」切换（见下方 .resume--en / .resume--zh）：
@@ -231,8 +232,8 @@ a:hover {
     0 0 0 1px rgba(23, 23, 23, 0.04);
 }
 
-/* 主按钮（下载）：白底 + 浅灰描边 + 极淡阴影 = 微浮起的白色 chip，
-   与语言切换的白色药丸同色阶同质感；悬停柔和反馈，不发黑不抢。 */
+/* 按钮（下载 / 回到顶部）：纯描边、无填充无阴影，两者同一套视觉，不做主次分级。
+   阴影只保留给语言切换的选中药丸——那里的浮起是在表达「选中」状态，是功能性的。 */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -248,34 +249,16 @@ a:hover {
   border-radius: var(--radius-md);
   corner-shape: var(--corner-smooth);
   border: 1px solid var(--gray-300);
-  background: #fff;
-  color: var(--ink);
-  box-shadow:
-    0 1px 2px rgba(23, 23, 23, 0.08),
-    0 0 0 1px rgba(23, 23, 23, 0.02);
-  cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
-}
-.btn:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-400);
-  box-shadow:
-    0 1px 3px rgba(23, 23, 23, 0.12),
-    0 0 0 1px rgba(23, 23, 23, 0.03);
-  text-decoration: none;
-}
-/* 次级按钮（回到顶部）：纯描边、无填充无阴影，弱于主按钮 */
-.btn--ghost {
   background: transparent;
   color: var(--ink);
-  border-color: var(--gray-300);
-  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
 }
-.btn--ghost:hover {
+.btn:hover {
   background: var(--gray-100);
   border-color: var(--gray-300);
   color: var(--ink);
-  box-shadow: none;
+  text-decoration: none;
 }
 /* 纯图标方形按钮（回到顶部）：正方形，仅图标 */
 .btn--icon {
@@ -310,7 +293,7 @@ a:hover {
 
 /* 中文简历名字用 Inter 时略收一号字重/字号，避免过重 */
 .resume--zh .r-name {
-  font-size: 34px;
+  font-size: var(--text-name-zh);
   font-weight: 700;
 }
 
@@ -591,7 +574,12 @@ a:hover {
 }
 
 @media print {
-  /* 打印字号阶级：正文 10pt，层级清晰、便于阅读 */
+  /* 打印字号阶级：正文 9.75pt。层级：21 / 13.5 / 10.5 / 9.75 / 9。
+     ⚠️ 取值必须是 0.75 的整数倍，否则渲染出来仍是脏值。
+     Chrome 永远按 px 布局，pt 只是入口单位（4px = 3pt）。写 10pt 会被转成
+     13.333…px、舍入成 13.33，再乘 0.75 输出 → 实际 9.9975pt。只有 pt ÷ 0.75
+     得整数 px 的值才能精确往返：9(12px) / 9.75(13px) / 10.5(14px) /
+     13.5(18px) / 18.75(25px) / 21(28px)。改这里前先做这道除法。 */
   :root {
     --space-1: 3px;
     --space-2: 6px;
@@ -603,19 +591,18 @@ a:hover {
     --space-8: 20px;
     --space-9: 24px;
 
-    --text-xs: 11.5px; /* ≈8.6pt 标签 */
-    --text-sm: 12.5px; /* ≈9.4pt 次级：日期/职位/附注/技能/联系 */
-    --text-base: 13.5px; /* ≈10pt 正文 */
-    --text-md: 14px; /* ≈10.5pt 条目标题（加粗） */
-    --text-lg: 15.5px;
-    --text-xl: 18px; /* ≈13.5pt 分节标题 */
-    --text-name: 28px; /* ≈21pt 姓名 */
+    --text-sm: 9pt; /* 12px · 联系方式 */
+    --text-base: 9.75pt; /* 13px · 正文：bullets / 日期 / 职位 / 地点 / 附注 / 技能 */
+    --text-md: 10.5pt; /* 14px · 条目标题（加粗） */
+    --text-xl: 13.5pt; /* 18px · 分节标题 */
+    --text-name: 21pt; /* 28px · 姓名 */
+    --text-name-zh: 18.75pt; /* 25px · 中文名用 Inter 字重更重，收一号 */
   }
 
   body {
     background: #fff;
     font-size: var(--text-base);
-    line-height: 1.42;
+    line-height: 1.35;
   }
   .screen {
     padding: 0;
@@ -633,9 +620,6 @@ a:hover {
     max-width: 100%;
     padding: 0 14mm;
   }
-  .resume--zh .r-name {
-    font-size: 25px;
-  }
   /* 分节之间留一点呼吸（比条目间距略大） */
   .r-section {
     margin-top: var(--space-5);
@@ -647,7 +631,7 @@ a:hover {
     line-height: 1.5;
   }
   .r-bullets li {
-    line-height: 1.42;
+    line-height: 1.35;
     padding-left: 16px;
   }
   /* 圆点竖直居中：对齐首行「行盒中心」，与字号/中英文无关（em 硬调会顾此失彼） */
