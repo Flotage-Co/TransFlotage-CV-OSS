@@ -84,7 +84,7 @@ export function ResumeSwitcher({
       <div className="actions">
         <button
           type="button"
-          className="btn btn--ghost btn--icon"
+          className="btn btn--icon"
           aria-label={shown === "en" ? "Back to top" : "回到顶部"}
           title={shown === "en" ? "Back to top" : "回到顶部"}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
