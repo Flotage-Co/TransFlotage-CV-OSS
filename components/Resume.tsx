@@ -111,6 +111,13 @@ export function ResumeEntry({
   children,
 }: {
   title: string;
+  /**
+   * 并列在 title 后的括号名，不加粗。**默认不要用。**
+   * 中文版有通行中文名时直接用中文名，不附英文括号——英文名不提供额外
+   * 信息（详见 docs/页面设计规范.md）；只有英文名通行时（如 ZONST Data
+   * Group）直接拿英文名当 title 即可。仅当中文名与英文名确实都必须出现、
+   * 且缺一读者无法识别该机构时才用。当前全项目零使用。
+   */
   titleSuffix?: string;
   href?: string;
   location?: string;
