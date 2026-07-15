@@ -136,7 +136,6 @@ function DemoChinese() {
       <ResumeSection title="教育背景">
         <ResumeEntry
           title="中山大学"
-          titleSuffix="Sun Yat-sen University"
           location="广州"
           role="工学学士，计算机科学与技术"
           date="2022.09 – 2026.06"
@@ -149,7 +148,6 @@ function DemoChinese() {
       <ResumeSection title="实习经历">
         <ResumeEntry
           title="腾讯"
-          titleSuffix="Tencent"
           location="深圳"
           role="后端开发实习生"
           date="2025.06 – 2025.09"
@@ -162,7 +160,6 @@ function DemoChinese() {
         </ResumeEntry>
         <ResumeEntry
           title="字节跳动"
-          titleSuffix="ByteDance"
           location="北京"
           role="算法研究实习生"
           date="2024.07 – 2024.10"
@@ -177,7 +174,6 @@ function DemoChinese() {
       <ResumeSection title="代表项目">
         <ResumeEntry
           title="分布式键值存储引擎"
-          titleSuffix="Distributed KV Store"
           href="https://github.com/example/kvstore"
           location="Go、Raft、LSM-Tree、gRPC"
           role="项目负责人"
@@ -190,7 +186,6 @@ function DemoChinese() {
         </ResumeEntry>
         <ResumeEntry
           title="中文医疗问答系统"
-          titleSuffix="Chinese Medical QA"
           location="Python、RAG、LLM、FAISS"
           role="核心开发"
           date="2023.09 – 2024.01"
