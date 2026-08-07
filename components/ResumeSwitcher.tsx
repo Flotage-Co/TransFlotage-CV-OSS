@@ -28,7 +28,7 @@ function titleCase(word: string): string {
 /**
  * 英文 PDF 文件名的名字部分（规则见 docs/页面设计规范.md#pdf-文件名）：
  * 取 names.en 的名（去括号昵称、Title Case），如 Zhiyuan LIN → Zhiyuan；
- * 中文名是两字的单字名（刘佳 → Jia）过于含糊，补姓区分：Jia_Liu。
+ * 中文名是两字的单字名（陈昕 → Xin）过于含糊，补姓区分：Xin_Chen。
  * 前提是 names.en 按「名在前、姓在后」书写（约定见设计规范）。
  */
 function enNamePart(en: string, zh?: string): string {
