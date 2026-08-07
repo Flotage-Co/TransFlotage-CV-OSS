@@ -26,9 +26,9 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const resume = getStudentResume(slug);
-  if (!resume) return { title: "Not found – CV" };
+  if (!resume) return { title: "Not found – Curriculum Vitae" };
   return {
-    title: `${resume.names.en} – CV`,
+    title: `${resume.names.en} – Curriculum Vitae`,
     description: resume.descriptions?.en,
     icons: { icon: makeFavicon(resume.names.en) },
   };

@@ -12,9 +12,18 @@ export function getResumePath(resume: StudentResume): string {
   return [resume.cohort, resume.slug].filter(Boolean).join("");
 }
 
-const resumeByPath = new Map(
-  resumes.map((resume) => [getResumePath(resume), resume]),
-);
+const resumeByPath = new Map<string, StudentResume>();
+for (const resume of resumes) {
+  const path = getResumePath(resume);
+  const existing = resumeByPath.get(path);
+  if (existing) {
+    // 路径撞车时 Map 会静默后者覆盖前者，构建照常通过——必须在这里拦下。
+    throw new Error(
+      `学生路径 /${path} 重复：${existing.slug} 与 ${resume.slug} 的 cohort+slug 拼出同一路径`,
+    );
+  }
+  resumeByPath.set(path, resume);
+}
 
 export function listResumes(): readonly StudentResume[] {
   return resumes;

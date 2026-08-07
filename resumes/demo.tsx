@@ -16,7 +16,7 @@ function DemoEnglish() {
   return (
     <ResumeDocument lang="en">
       <ResumeHeader
-        name="Lin Zhiyuan"
+        name="Zhiyuan LIN"
         summary="Backend and machine-learning engineer with internships at Tencent and ByteDance, building high-concurrency systems and recommendation models. I like owning a problem end to end — from distributed-systems design to shipping measurable gains in production — and am now seeking an MSc to deepen my research in distributed systems and applied ML."
         contacts={[
           { label: "linzhiyuan@example.com", href: "mailto:linzhiyuan@example.com", icon: "email" },
@@ -222,7 +222,7 @@ function DemoChinese() {
 
 export const demoResume: StudentResume = {
   slug: "demo",
-  names: { en: "Lin Zhiyuan", zh: "林知远" },
+  names: { en: "Zhiyuan LIN", zh: "林知远" },
   descriptions: {
     en: "Backend and machine-learning engineer with experience in distributed systems and recommendation models.",
     zh: "后端与机器学习方向学生简历。",

@@ -10,7 +10,15 @@ export function ResumeDocument({
   lang: Lang;
   children: ReactNode;
 }) {
-  return <article className={`resume resume--${lang}`}>{children}</article>;
+  // lang 属性跟随简历语言（根布局是 en）：读屏发音、翻译提示、字体回退都依赖它。
+  return (
+    <article
+      className={`resume resume--${lang}`}
+      lang={lang === "zh" ? "zh-CN" : "en"}
+    >
+      {children}
+    </article>
+  );
 }
 
 export type ResumeContact = {
@@ -30,8 +38,13 @@ export function ResumeHeader({
   nameEn?: string;
   summary?: string;
   contacts?: ResumeContact[];
-  /** 强制布局；省略时按有无 summary / 联系方式数量自动判断。stack = 联系方式横排于名字下方。 */
-  layout?: "split" | "stack";
+  /**
+   * 强制布局；省略时自动判断：无 summary → compact，有 summary 且联系方式
+   * ≤3 → split，更多 → stack（名字/联系方式/summary 自上而下）。
+   * compact 与 split 共用 .r-head__top 结构，仅 summary 有无之差，
+   * `.r-head--compact` 无专属 CSS 规则、类名只作语义锚点（见 globals.css 抬头段注释）。
+   */
+  layout?: "compact" | "split" | "stack";
 }) {
   const layout =
     layoutProp ?? (!summary ? "compact" : contacts.length <= 3 ? "split" : "stack");
@@ -101,30 +114,41 @@ export function ResumeSection({
   );
 }
 
-export function ResumeEntry({
-  title,
-  titleSuffix,
-  href,
-  location,
-  role,
-  date,
-  children,
-}: {
+type ResumeEntryProps = {
   title: string;
-  /**
-   * 并列在 title 后的括号名，不加粗。**默认不要用。**
-   * 中文版有通行中文名时直接用中文名，不附英文括号——英文名不提供额外
-   * 信息（详见 docs/页面设计规范.md）；只有英文名通行时（如 ZONST Data
-   * Group）直接拿英文名当 title 即可。仅当中文名与英文名确实都必须出现、
-   * 且缺一读者无法识别该机构时才用。当前全项目零使用。
-   */
-  titleSuffix?: string;
   href?: string;
   location?: string;
   role?: ReactNode;
   date?: string;
   children?: ReactNode;
-}) {
+} & (
+  | { titleSuffix?: never; lang?: never }
+  | {
+      /**
+       * 并列在 title 后的括号补充，不加粗，括号随 lang 取全角（中文）或
+       * 半角（英文）——页面内不要自己写括号。两类用途：
+       * 1. 机构资质标注，如「双一流 A 类、985 工程」。
+       * 2. 中英文名缺一不可识别的机构附另一语言名——罕见，默认不用：
+       *    中文版有通行中文名时直接用中文名，不附英文直译括号（详见
+       *    docs/页面设计规范.md §4）；只有英文名通行时（如 ZONST Data
+       *    Group）直接拿英文名当 title 即可。
+       */
+      titleSuffix: string;
+      /** titleSuffix 括号的语言，与所在 ResumeDocument 保持一致。 */
+      lang: Lang;
+    }
+);
+
+export function ResumeEntry({
+  title,
+  titleSuffix,
+  lang,
+  href,
+  location,
+  role,
+  date,
+  children,
+}: ResumeEntryProps) {
   return (
     <div className="r-entry">
       <div className="r-entry__head">
@@ -136,7 +160,11 @@ export function ResumeEntry({
           ) : (
             P(title)
           )}
-          {titleSuffix && <span className="r-entry__org-en">（{titleSuffix}）</span>}
+          {titleSuffix && (
+            <span className="r-entry__org-suffix">
+              {lang === "zh" ? `（${P(titleSuffix)}）` : ` (${P(titleSuffix)})`}
+            </span>
+          )}
         </p>
         {location && <span className="r-entry__loc">{P(location)}</span>}
       </div>
