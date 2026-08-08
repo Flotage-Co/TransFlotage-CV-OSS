@@ -63,12 +63,14 @@ export default function RootLayout({
 }>) {
   return (
     // 默认版本是英文简历，根语言为 en；中英文正文各自在 ResumeDocument 上标注 lang。
-    <html lang="en">
-      <body
-        className={`${cormorant.variable} ${libre.variable} ${inter.variable} ${notoSansSC.variable}`}
-      >
-        {children}
-      </body>
+    // 字体变量必须挂在 <html>：globals.css 的 :root 用 var(--font-inter) 等组装
+    // --font-body，挂在 <body> 上时 :root 取不到值，整条 --font-body 作废（CSS 规范：
+    // 自定义属性引用未定义变量即失效），页面 chrome 会掉到浏览器默认字体。
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${libre.variable} ${inter.variable} ${notoSansSC.variable}`}
+    >
+      <body>{children}</body>
     </html>
   );
 }

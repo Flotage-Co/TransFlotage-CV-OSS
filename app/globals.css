@@ -20,6 +20,12 @@ html {
   line-height: 1.5;
   tab-size: 4;
   -webkit-text-size-adjust: 100%;
+  /* 无衬线兜底：正常情况下 body 会被 --font-body（Inter）覆盖，这行只在
+     字体变量取不到时兜住，避免掉进浏览器默认字体（macOS 上是 PingFang SC）。 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* 去掉移动端点击时的灰色高亮块 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,
@@ -44,7 +50,8 @@ menu {
 }
 
 button {
-  appearance: none;
+  /* Preflight 用 button（而非 none）拉平各浏览器的原生按钮渲染 */
+  appearance: button;
   background-color: transparent;
   font: inherit;
   color: inherit;
