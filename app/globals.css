@@ -20,6 +20,12 @@ html {
   line-height: 1.5;
   tab-size: 4;
   -webkit-text-size-adjust: 100%;
+  /* 无衬线兜底：正常情况下 body 会被 --font-body（Inter）覆盖，这行只在
+     字体变量取不到时兜住，避免掉进浏览器默认字体（macOS 上是 PingFang SC）。 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* 去掉移动端点击时的灰色高亮块 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,
@@ -44,7 +50,8 @@ menu {
 }
 
 button {
-  appearance: none;
+  /* Preflight 用 button（而非 none）拉平各浏览器的原生按钮渲染 */
+  appearance: button;
   background-color: transparent;
   font: inherit;
   color: inherit;
@@ -124,20 +131,23 @@ video {
      字体按简历「语言版本」切换（见下方 .resume--en / .resume--zh）：
      - 英文简历：Cormorant Garamond（姓名）+ Libre Baskerville（正文），衬线，aleckmann 风。
      - 中文简历：Noto Sans SC（中文）+ Inter（夹带的英文），无衬线。
-     root 默认给页面 chrome（切换按钮/下载按钮）用中性无衬线。 */
-  --font-body: "Inter", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+     root 默认给页面 chrome（切换按钮/下载按钮）用中性无衬线。
+     --font-cormorant / --font-libre / --font-inter / --font-noto-sc 是
+     app/layout.tsx 里 next/font 生成的变量（构建期自托管，自带按字宽校准
+     的本地回退字体），后面的 system-ui / Georgia 等是变量缺失时的兜底。 */
+  --font-body: var(--font-inter), var(--font-noto-sc), system-ui, -apple-system, sans-serif;
   --font-name: var(--font-body);
 }
 
 /* 英文简历：衬线（aleckmann） */
 .resume--en {
-  --font-body: "Libre Baskerville", "Noto Sans SC", Georgia, "Times New Roman", serif;
-  --font-name: "Cormorant Garamond", "Noto Sans SC", Georgia, serif;
+  --font-body: var(--font-libre), var(--font-noto-sc), Georgia, "Times New Roman", serif;
+  --font-name: var(--font-cormorant), var(--font-noto-sc), Georgia, serif;
 }
 /* 中文简历：Noto Sans SC + 夹带英文用 Inter，无衬线 */
 .resume--zh {
-  --font-body: "Inter", "Noto Sans SC", system-ui, -apple-system, sans-serif;
-  --font-name: "Inter", "Noto Sans SC", system-ui, sans-serif;
+  --font-body: var(--font-inter), var(--font-noto-sc), system-ui, -apple-system, sans-serif;
+  --font-name: var(--font-inter), var(--font-noto-sc), system-ui, sans-serif;
 }
 
 html {
@@ -420,7 +430,8 @@ a:hover {
   font-weight: 700;
   margin: 0;
 }
-.r-entry__org-en {
+/* 标题后的括号补充（资质标注等，见 ResumeEntry titleSuffix）：不加粗 */
+.r-entry__org-suffix {
   font-weight: 400;
   color: var(--ink);
 }
@@ -476,9 +487,10 @@ a:hover {
   border: 1.25px solid var(--gray-500);
 }
 
-/* 附注行（课程 / 技术栈）：英文斜体、中文正体，同主文本色 */
+/* 附注行（GPA / 技术栈）：紧贴上方学位 / 职位行（与 .r-entry__line 的 1px 一致），
+   作为条目头部的「学位数据」，而非下方课程明细；到 .r-bullets 才用 space-2 拉开分组 */
 .r-note {
-  margin: var(--space-2) 0 0;
+  margin: 1px 0 0;
   font-style: italic;
   color: var(--ink);
 }
@@ -624,8 +636,10 @@ a:hover {
   .r-section {
     margin-top: var(--space-5);
   }
+  /* 抬头（个人基础信息）与第一节（教育背景）之间留双倍间距：
+     与首节 margin-top(var(--space-5)) 折叠后，可见间距 = 2×14px = 28px */
   .r-head {
-    margin-bottom: var(--space-5);
+    margin-bottom: calc(var(--space-5) * 2);
   }
   .r-summary {
     line-height: 1.5;

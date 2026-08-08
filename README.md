@@ -26,6 +26,7 @@ TransFlotage 留学工作室的学生在线简历系统 —— 中英双语、�
 - TypeScript
 - Puppeteer（构建期批量生成 A4 PDF，仅 devDependency）
 - 纯 CSS 设计令牌 —— 没有 UI 框架，也没有一个工具类；`app/globals.css` 顶部自带 reset
+- 字体由 `next/font` 在构建期下载并自托管，运行时不请求 Google Fonts
 
 ## 目录结构
 
@@ -48,9 +49,13 @@ resumes/
 docs/
   页面设计规范.md      固定的视觉、文字和输出规范
   AI生成提示词.md      让 AI 直接生成学生 TSX 页面的提示词
+public/
+  favicon.ico          Safari 兜底图标（不支持 SVG favicon 时回退到它）
+  apple-touch-icon.png iOS 主屏图标
 scripts/
   render-pdf.mjs       批量生成 A4 PDF
   screenshot.mjs       页面截图
+  make-favicon.mjs     生成 public/ 下的两个兜底图标
 serve.json             本地预览的静态服务配置（关闭目录列表）
 ```
 
@@ -99,14 +104,14 @@ npm run start   # http://localhost:3000
 2. 阅读 [`docs/页面设计规范.md`](docs/页面设计规范.md)。
 3. 使用 [`docs/AI生成提示词.md`](docs/AI生成提示词.md) 让 AI 生成 `resumes/<slug>.tsx`。
 4. 在 `resumes/index.ts` 导入并登记学生页面。
-5. 运行 `npm run lint` 和 `npm run build`。
+5. 运行 `npm run lint` 和 `npm run build`（PR 上由 `.github/workflows/ci.yml` 兜底）。
 6. 检查桌面端、窄屏、中英文和 A4 打印效果。
 
 学生页面只需要提供最小登记信息：
 
 - `slug`：页面路径。
 - `cohort`：可选的届别，例如 `"27"`。
-- `names`：中英文姓名，用于页面标题与 PDF 文件名。
+- `names`：中英文姓名，用于页面标题、favicon 首字母和 PDF 文件名。英文名写成**名在前、姓在后且姓全大写**（`Zhiyuan LIN`），PDF 文件名规则据此取名，见 [`docs/页面设计规范.md`](docs/页面设计规范.md#pdf-文件名)。
 - `descriptions`：可选的页面描述。
 - `pages`：中英文 TSX 页面组件。
 
@@ -122,7 +127,7 @@ npm run start   # http://localhost:3000
 
 ## PDF 输出
 
-页面中的「PDF」按钮调用浏览器打印，并按「姓名 + CV + 语言 + 年月」生成文件名。
+页面中的「PDF」按钮调用浏览器打印，文件名为 `<名字>_CV_<语言>_<年月>`：英文取英文名（`Zhiyuan_CV_EN_2608`，单字名补姓如 `Xin_Chen_CV_EN_2608`），中文取中文全名（`林知远_CV_ZH_2608`）。文件名规则只在 `components/ResumeSwitcher.tsx` 一处计算，CLI 脚本通过点击真实下载按钮复用同一路径，完整规则见 [`docs/页面设计规范.md`](docs/页面设计规范.md#pdf-文件名)。
 
 批量生成需要先有一个跑起来的站点：
 
@@ -132,7 +137,7 @@ npm run start                                   # 另开一个终端
 npm run pdf -- http://localhost:3000 demo public/pdf
 ```
 
-默认同时输出英文版和中文版；若学生只有一个语言版本，在命令末尾加 `en` 或 `zh` 指定。生成的 PDF 不入库（见 `.gitignore`）。
+默认输出该学生已有的语言版本（没有中文版会自动跳过）；也可在命令末尾加 `en` 或 `zh` 只生成单个版本。生成的 PDF 不入库（见 `.gitignore`）。
 
 ## 隐私
 

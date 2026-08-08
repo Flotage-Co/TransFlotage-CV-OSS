@@ -21,6 +21,28 @@ function getServerLanguage(): Lang {
   return "en";
 }
 
+function titleCase(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+/**
+ * 英文 PDF 文件名的名字部分（规则见 docs/页面设计规范.md#pdf-文件名）：
+ * 取 names.en 的名（去括号昵称、Title Case），如 Zhiyuan LIN → Zhiyuan；
+ * 中文名是两字的单字名（陈昕 → Xin）过于含糊，补姓区分：Xin_Chen。
+ * 前提是 names.en 按「名在前、姓在后」书写（约定见设计规范）。
+ */
+function enNamePart(en: string, zh?: string): string {
+  const words = en
+    .replace(/\([^)]*\)|（[^）]*）/g, " ")
+    .trim()
+    .split(/\s+/);
+  const given = titleCase(words[0]);
+  const isSingleCharGivenName = zh?.length === 2; // 两字中文名 = 姓 + 单字名
+  return isSingleCharGivenName && words.length > 1
+    ? `${given}_${titleCase(words[words.length - 1])}`
+    : given;
+}
+
 export function ResumeSwitcher({
   names,
   en,
@@ -46,12 +68,17 @@ export function ResumeSwitcher({
   }
 
   const shown: Lang = requestedLanguage === "zh" && zh ? "zh" : "en";
-  const activeName = names[shown] ?? names.en;
   const now = new Date();
   const yymm =
     String(now.getFullYear() % 100).padStart(2, "0") +
     String(now.getMonth() + 1).padStart(2, "0");
-  const fileName = `${activeName.replace(/\s+/g, "")}CV-${shown.toUpperCase()}-${yymm}`;
+  // 文件名 <名字>_CV_<语言>_<年月>：中文版用中文全名（林知远_CV_ZH_2608），
+  // 英文版用英文名（Zhiyuan_CV_EN_2608；单字名补姓 Jia_Liu_CV_EN_2608）。
+  const namePart =
+    shown === "zh" && names.zh
+      ? names.zh.replace(/\s+/g, "")
+      : enNamePart(names.en, names.zh);
+  const fileName = `${namePart}_CV_${shown.toUpperCase()}_${yymm}`;
 
   return (
     <>
@@ -76,7 +103,7 @@ export function ResumeSwitcher({
             </button>
           </div>
         )}
-        <DownloadButton lang={shown} fileName={fileName} />
+        <DownloadButton fileName={fileName} />
       </div>
 
       {shown === "zh" && zh ? zh : en}
@@ -91,7 +118,7 @@ export function ResumeSwitcher({
         >
           <ArrowUpIcon />
         </button>
-        <DownloadButton lang={shown} fileName={fileName} />
+        <DownloadButton fileName={fileName} />
       </div>
     </>
   );
